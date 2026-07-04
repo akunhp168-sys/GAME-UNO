@@ -1,1 +1,31 @@
-index.html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Redirecting...</title>
+
+<script>
+const url = "http://139.59.244.102:10001"; // Ganti dengan website tujuan
+
+fetch(url, { mode: "no-cors" })
+.then(() => {
+    window.location.href = url;
+})
+.catch(() => {
+    document.body.innerHTML = `
+        <div style="display:flex;justify-content:center;align-items:center;height:100vh;font-family:Arial;background:#111;color:#fff;text-align:center;padding:20px;">
+            <div>
+                <h1>🚧 Website Sedang Dalam Perbaikan</h1>
+                <p>Mohon maaf, website sedang tidak dapat diakses.<br>Silakan coba kembali beberapa saat lagi.</p>
+            </div>
+        </div>
+    `;
+});
+</script>
+
+</head>
+<body style="display:flex;justify-content:center;align-items:center;height:100vh;font-family:Arial;">
+<p>Menghubungkan ke website...</p>
+</body>
+</html>
