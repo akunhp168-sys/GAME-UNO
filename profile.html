@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Profil — UNO GAME</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+<link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="dev-body">
+
+  <div id="toastContainer" class="toast-container"></div>
+
+  <header class="topbar">
+    <button class="icon-btn" onclick="window.location.href='/app.html'" aria-label="Kembali">
+      <i class="fa-solid fa-chevron-left"></i>
+    </button>
+    <div class="topbar-title" id="pageTitle">Profil</div>
+    <div style="width:34px"></div>
+  </header>
+
+  <main class="profile-page">
+
+    <!-- ---- Mode lihat ---- -->
+    <section id="viewMode">
+      <div class="profile-avatar-wrap profile-avatar-wrap-lg">
+        <div class="profile-avatar profile-avatar-lg" id="pfAvatar">?</div>
+      </div>
+      <h1 class="dev-name" id="pfName">—</h1>
+      <p class="profile-bio" id="pfBio">Belum ada bio.</p>
+
+      <div class="profile-stats-grid">
+        <div class="profile-stat">
+          <div class="profile-stat-value" id="pfGamesPlayed">0</div>
+          <div class="profile-stat-label">Jumlah Main</div>
+        </div>
+        <div class="profile-stat">
+          <div class="profile-stat-value" id="pfGamesWon">0</div>
+          <div class="profile-stat-label">Menang</div>
+        </div>
+        <div class="profile-stat">
+          <div class="profile-stat-value" id="pfWinRate">0%</div>
+          <div class="profile-stat-label">Win Rate</div>
+        </div>
+      </div>
+
+      <div class="dev-card">
+        <p>📅 Bergabung sejak <strong id="pfJoined">—</strong></p>
+      </div>
+
+      <button class="btn-primary" id="editBtn" style="display:none;">✏️ Edit Profil</button>
+      <button class="btn-secondary" id="backHomeBtn">Kembali ke Beranda</button>
+    </section>
+
+    <!-- ---- Mode edit (hanya profil sendiri) ---- -->
+    <section id="editMode" style="display:none;">
+      <div class="profile-avatar-wrap profile-avatar-wrap-lg">
+        <div class="profile-avatar profile-avatar-lg" id="editAvatarPreview">?</div>
+        <label class="avatar-upload-btn" for="avatarFileInput">📷</label>
+        <input type="file" id="avatarFileInput" accept="image/*" hidden />
+      </div>
+
+      <div class="dev-card" style="text-align:left;">
+        <label>Bio <span class="muted" style="font-weight:400;">(maks 160 karakter)</span></label>
+        <textarea id="bioInput" maxlength="160" rows="4" placeholder="Ceritain sedikit tentang kamu..."></textarea>
+      </div>
+
+      <p class="auth-error" id="editError"></p>
+      <button class="btn-primary" id="saveBtn">💾 Simpan Perubahan</button>
+      <button class="btn-secondary" id="cancelBtn">Batal</button>
+    </section>
+
+  </main>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/profile.js"></script>
+</body>
+</html>

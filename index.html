@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+<title>UNO GAME — Masuk</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+<link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="auth-body">
+
+  <div class="auth-wrap">
+    <div class="auth-brand">
+      <div class="brand-logo">
+        <div class="brand-card brand-card-1"></div>
+        <div class="brand-card brand-card-2"></div>
+        <div class="brand-card brand-card-3"></div>
+        <div class="brand-card brand-card-4"><i class="fa-solid fa-bolt"></i></div>
+      </div>
+      <h1 class="brand-title">UNO<span>GAME</span></h1>
+      <p class="brand-tag"><i class="fa-solid fa-comments"></i> Kumpul, ngobrol, adu kartu.</p>
+    </div>
+
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Masuk</button>
+        <button class="auth-tab" data-tab="register">Daftar</button>
+      </div>
+
+      <form id="loginForm" class="auth-form active">
+        <label>Username</label>
+        <input type="text" id="loginUsername" autocomplete="username" required />
+        <label>Password</label>
+        <input type="password" id="loginPassword" autocomplete="current-password" required />
+        <p class="auth-error" id="loginError"></p>
+        <button type="submit" class="btn-primary">Masuk</button>
+      </form>
+
+      <form id="registerForm" class="auth-form">
+        <label>Username</label>
+        <input type="text" id="registerUsername" autocomplete="username" required minlength="3" maxlength="20" />
+        <label>Password</label>
+        <input type="password" id="registerPassword" autocomplete="new-password" required minlength="6" />
+        <p class="auth-error" id="registerError"></p>
+        <p class="auth-success" id="registerSuccess"></p>
+        <button type="submit" class="btn-primary">Buat Akun</button>
+      </form>
+    </div>
+
+    <p class="auth-footer">Dev by AryaFox</p>
+  </div>
+
+<script src="/js/auth.js"></script>
+</body>
+</html>
