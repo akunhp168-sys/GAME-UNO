@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+<title>UNO GAME</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+<link rel="stylesheet" href="/css/style.css" />
+<script src="/socket.io/socket.io.js"></script>
+</head>
+<body class="app-body">
+
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <button id="menuBtn" class="icon-btn" aria-label="Menu">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+    <div class="topbar-title">UNO<span>GAME</span></div>
+    <button id="devInfoBtn" class="icon-btn" aria-label="Info developer">
+      <i class="fa-solid fa-circle-info"></i>
+    </button>
+  </header>
+
+  <!-- Side menu -->
+  <div id="sideMenuOverlay" class="side-menu-overlay"></div>
+  <nav id="sideMenu" class="side-menu">
+    <div class="side-menu-header">
+      <div class="avatar-circle" id="sideMenuAvatar">?</div>
+      <div>
+        <div class="side-menu-name" id="sideMenuUsername">—</div>
+        <div class="side-menu-sub">Online</div>
+      </div>
+    </div>
+    <ul class="side-menu-list">
+      <li data-action="profile"><i class="fa-solid fa-user"></i> Profil Saya</li>
+      <li data-action="dev"><i class="fa-solid fa-circle-info"></i> Info Developer</li>
+      <li data-action="logout"><i class="fa-solid fa-right-from-bracket"></i> Keluar</li>
+    </ul>
+  </nav>
+
+  <!-- ================= HOME ================= -->
+  <main id="view-home" class="view active">
+    <section class="home-banner">
+      <div class="home-logo-mark">
+        <i class="fa-solid fa-layer-group"></i>
+      </div>
+      <div class="home-banner-text">
+        <h1>UNO<span>GAME</span></h1>
+        <p>Kumpul, ngobrol, adu kartu bareng temanmu.</p>
+      </div>
+    </section>
+
+    <section class="home-hero">
+      <div class="home-hero-avatar" id="homeHeroAvatar">?</div>
+      <div class="home-hero-text">
+        <h2>Halo, <span id="homeUsername">Player</span> <i class="fa-solid fa-hand-peace"></i></h2>
+        <p>Siap adu kartu hari ini?</p>
+      </div>
+      <button class="btn-primary" data-goto="game"><i class="fa-solid fa-play"></i> Main Sekarang</button>
+    </section>
+
+    <section class="home-stats">
+      <div class="stat-card">
+        <i class="fa-solid fa-circle-user stat-icon"></i>
+        <div class="stat-value" id="onlineCount">0</div>
+        <div class="stat-label">Pemain Online</div>
+      </div>
+      <div class="stat-card">
+        <i class="fa-solid fa-door-open stat-icon"></i>
+        <div class="stat-value" id="openRoomCount">0</div>
+        <div class="stat-label">Room Terbuka</div>
+      </div>
+    </section>
+
+    <section class="home-menu">
+      <h3 class="section-title">Menu</h3>
+      <div class="home-menu-grid">
+        <button class="menu-tile" data-href="/profile.html">
+          <span class="menu-tile-icon"><i class="fa-solid fa-user"></i></span>
+          <span class="menu-tile-label">Profil Saya</span>
+        </button>
+        <button class="menu-tile" data-goto="chat">
+          <span class="menu-tile-icon"><i class="fa-solid fa-comment-dots"></i></span>
+          <span class="menu-tile-label">Chat</span>
+        </button>
+        <button class="menu-tile" data-goto="game">
+          <span class="menu-tile-icon"><i class="fa-solid fa-layer-group"></i></span>
+          <span class="menu-tile-label">Room Game</span>
+        </button>
+        <button class="menu-tile" data-href="/dev-info.html">
+          <span class="menu-tile-icon"><i class="fa-solid fa-circle-info"></i></span>
+          <span class="menu-tile-label">Info &amp; Update</span>
+        </button>
+      </div>
+    </section>
+
+    <div class="home-empty-space"></div>
+  </main>
+
+  <!-- ================= CHAT ================= -->
+  <main id="view-chat" class="view">
+    <div class="chat-shell" id="chatShell">
+      <div class="chat-list-pane" id="chatListPane">
+        <div class="chat-list-header">
+          <h3>Chat</h3>
+          <button class="btn-icon-sm" id="newPrivateChatBtn"><i class="fa-solid fa-user-plus"></i> Pribadi</button>
+        </div>
+        <div class="chat-list">
+          <button class="chat-list-item active" data-thread="public">
+            <div class="chat-avatar chat-avatar-public">🌐</div>
+            <div class="chat-list-meta">
+              <div class="chat-list-name">Grup Publik</div>
+              <div class="chat-list-preview" id="publicPreview">Semua pemain gabung di sini</div>
+            </div>
+            <span class="unread-dot" data-role="unread-dot" style="display:none;"></span>
+          </button>
+          <div id="privateThreadList"></div>
+        </div>
+      </div>
+
+      <div class="chat-window-pane" id="chatWindowPane">
+        <div class="chat-window-header">
+          <button class="btn-icon-sm back-to-list" id="backToListBtn"><i class="fa-solid fa-chevron-left"></i></button>
+          <div class="chat-window-title" id="chatWindowTitle">Grup Publik</div>
+        </div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <form class="chat-input-row" id="chatInputForm">
+          <input type="text" id="chatInput" placeholder="Tulis pesan..." autocomplete="off" />
+          <button type="submit" class="btn-icon-send">➤</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- New private chat search modal -->
+    <div id="searchUserModal" class="modal-overlay">
+      <div class="modal-card">
+        <h3>Cari Pemain</h3>
+        <input type="text" id="userSearchInput" placeholder="Ketik username..." />
+        <div id="userSearchResults" class="search-results-list"></div>
+        <button class="btn-secondary" data-close="searchUserModal">Tutup</button>
+      </div>
+    </div>
+
+    <!-- Message context menu -->
+    <div id="msgContextMenu" class="context-menu">
+      <button data-act="copy">Salin</button>
+      <button data-act="forward">Teruskan</button>
+      <button data-act="delete">Hapus</button>
+    </div>
+
+    <!-- Forward modal -->
+    <div id="forwardModal" class="modal-overlay">
+      <div class="modal-card">
+        <h3>Teruskan ke...</h3>
+        <div id="forwardTargetList" class="search-results-list"></div>
+        <button class="btn-secondary" data-close="forwardModal">Batal</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= GAME ================= -->
+  <main id="view-game" class="view">
+    <div id="gameLobby" class="game-lobby active">
+      <div class="game-lobby-toolbar">
+        <button class="fab-add" id="createRoomBtn" title="Buat Room">+</button>
+        <div class="search-room-box">
+          <input type="text" id="searchRoomInput" placeholder="Cari ID room..." />
+        </div>
+      </div>
+      <h3 class="section-title">Room Terbuka</h3>
+      <div id="roomList" class="room-list"></div>
+    </div>
+
+    <!-- Create room modal -->
+    <div id="createRoomModal" class="modal-overlay">
+      <div class="modal-card">
+        <h3>Buat Room</h3>
+        <label>Nama Room</label>
+        <input type="text" id="roomNameInput" placeholder="Room seru-seruan" maxlength="40" />
+        <label>Jumlah Pemain</label>
+        <select id="roomMaxPlayers">
+          <option value="2">2 Pemain</option>
+          <option value="3">3 Pemain</option>
+          <option value="4" selected>4 Pemain</option>
+          <option value="5">5 Pemain</option>
+          <option value="6">6 Pemain</option>
+          <option value="7">7 Pemain</option>
+          <option value="8">8 Pemain</option>
+          <option value="9">9 Pemain</option>
+          <option value="10">10 Pemain</option>
+        </select>
+        <label>Password (opsional)</label>
+        <input type="text" id="roomPasswordInput" placeholder="Kosongkan jika tidak perlu" />
+        <p class="auth-error" id="createRoomError"></p>
+        <button class="btn-primary" id="confirmCreateRoomBtn">Buat &amp; Masuk</button>
+        <button class="btn-secondary" data-close="createRoomModal">Batal</button>
+      </div>
+    </div>
+
+    <!-- Join password modal -->
+    <div id="joinPasswordModal" class="modal-overlay">
+      <div class="modal-card">
+        <h3>Room Terkunci</h3>
+        <label>Masukkan Password</label>
+        <input type="text" id="joinPasswordInput" />
+        <p class="auth-error" id="joinPasswordError"></p>
+        <button class="btn-primary" id="confirmJoinPasswordBtn">Masuk</button>
+        <button class="btn-secondary" data-close="joinPasswordModal">Batal</button>
+      </div>
+    </div>
+
+    <!-- Room waiting room -->
+    <div id="roomWaiting" class="room-waiting">
+      <div class="room-waiting-header">
+        <button class="btn-icon-sm" id="leaveRoomBtn"><i class="fa-solid fa-chevron-left"></i> Keluar</button>
+        <div id="roomWaitingTitle">Room</div>
+      </div>
+      <div class="room-waiting-id">ID Room: <strong id="roomWaitingId">—</strong></div>
+      <div id="roomMemberList" class="room-member-list"></div>
+      <button class="btn-primary" id="startGameBtn">Mulai Game</button>
+      <p class="muted" id="waitingHint">Menunggu host memulai game...</p>
+
+      <div class="room-chat-box">
+        <div class="room-chat-quick">
+          <button class="quick-chip" data-quick="Ayo mulai! 🔥">Ayo mulai! 🔥</button>
+          <button class="quick-chip" data-quick="Siap 👍">Siap 👍</button>
+          <button class="quick-chip" data-quick="Tunggu bentar ⏳">Tunggu bentar ⏳</button>
+        </div>
+        <div class="room-chat-log" id="roomChatLog"></div>
+        <form class="room-chat-form" id="roomChatForm">
+          <input type="text" id="roomChatInput" placeholder="Ketik pesan buat sesama pemain..." maxlength="200" autocomplete="off" />
+          <button type="submit" class="btn-icon-sm"><i class="fa-solid fa-paper-plane"></i></button>
+        </form>
+      </div>
+    </div>
+
+    <!-- UNO Game board -->
+    <div id="gameBoard" class="game-board">
+      <div class="board-top">
+        <button class="btn-icon-sm" id="exitGameBtn"><i class="fa-solid fa-chevron-left"></i></button>
+        <div class="opponents-row" id="opponentsRow"></div>
+        <button class="btn-icon-sm" id="gameChatToggleBtn"><i class="fa-solid fa-comment-dots"></i></button>
+      </div>
+
+      <div id="chatBubbleLayer"></div>
+
+      <div class="board-center">
+        <div class="pile-stack">
+          <div class="draw-pile" id="drawPileBtn">
+            <div class="card card-back"></div>
+            <div class="pile-count" id="drawPileCount">0</div>
+          </div>
+          <div class="discard-pile" id="discardPileCard"></div>
+        </div>
+        <div class="active-color-dot" id="activeColorDot"></div>
+        <div class="turn-indicator" id="turnIndicator">Menunggu...</div>
+      </div>
+
+      <div class="board-bottom">
+        <div class="my-panel" id="myPanel">
+          <div class="timer-ring" id="myTimerRing" data-player="">
+            <div class="player-avatar" id="myPanelAvatar">?</div>
+            <div class="timer-badge" id="myTimerBadge">20</div>
+          </div>
+          <div class="my-panel-name" id="myPanelName">Kamu</div>
+        </div>
+        <div class="my-hand" id="myHand"></div>
+        <button class="btn-uno-call" id="callUnoBtn">UNO!</button>
+      </div>
+
+      <!-- Drawer chat dalam game -->
+      <div id="gameChatDrawer" class="game-chat-drawer">
+        <div class="game-chat-drawer-header">
+          <span><i class="fa-solid fa-comment-dots"></i> Obrolan Room</span>
+          <button class="btn-icon-sm" id="closeGameChatBtn"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="room-chat-log" id="gameChatLog"></div>
+        <div class="room-chat-quick">
+          <button class="quick-chip" data-quick-game="GG 🤝">GG 🤝</button>
+          <button class="quick-chip" data-quick-game="Sabar dulu 😅">Sabar dulu 😅</button>
+          <button class="quick-chip" data-quick-game="UNO! 🔥">UNO! 🔥</button>
+        </div>
+        <form class="room-chat-form" id="gameChatForm">
+          <input type="text" id="gameChatInput" placeholder="Kirim pesan..." maxlength="200" autocomplete="off" />
+          <button type="submit" class="btn-icon-sm"><i class="fa-solid fa-paper-plane"></i></button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Color picker for wild -->
+    <div id="colorPickerModal" class="modal-overlay">
+      <div class="modal-card color-picker-card">
+        <h3>Pilih Warna</h3>
+        <div class="color-picker-grid">
+          <button class="color-swatch swatch-red" data-color="red"></button>
+          <button class="color-swatch swatch-yellow" data-color="yellow"></button>
+          <button class="color-swatch swatch-green" data-color="green"></button>
+          <button class="color-swatch swatch-blue" data-color="blue"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game over modal -->
+    <div id="gameOverModal" class="modal-overlay">
+      <div class="modal-card game-over-card">
+        <div class="game-over-icon" id="gameOverIcon"><i class="fa-solid fa-trophy"></i></div>
+        <h3 id="gameOverTitle">Game Selesai</h3>
+        <p id="gameOverText"></p>
+        <button class="btn-primary" id="backToRoomBtn"><i class="fa-solid fa-rotate-right"></i> Kembali ke Room</button>
+        <button class="btn-secondary" id="exitToHomeBtn"><i class="fa-solid fa-door-open"></i> Keluar Room</button>
+      </div>
+    </div>
+  </main>
+
+
+
+  <!-- ================= BOTTOM NAV ================= -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-view="home">
+      <i class="fa-solid fa-house"></i>
+      <span>Home</span>
+    </button>
+    <button class="nav-item" data-view="chat">
+      <i class="fa-solid fa-comment-dots"></i>
+      <span>Chat</span>
+    </button>
+    <button class="nav-item" data-view="game">
+      <i class="fa-solid fa-layer-group"></i>
+      <span>Game</span>
+    </button>
+  </nav>
+
+<script src="/js/app.js"></script>
+</body>
+</html>
